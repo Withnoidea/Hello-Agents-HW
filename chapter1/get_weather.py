@@ -92,9 +92,9 @@ def get_weather(city: str) -> str:
 
 
 
-while True:
-    city = input("请输入城市名称查询当地天气\n(输入exit退出程序):")
-    if city.lower() == 'exit':
-        print("退出程序。")
-        break
-    print(get_weather(city))
+# while True:
+#     city = input("请输入城市名称查询当地天气\n(输入exit退出程序):")
+#     if city.lower() == 'exit':
+#         print("退出程序。")
+#         break
+#     print(get_weather(city))
