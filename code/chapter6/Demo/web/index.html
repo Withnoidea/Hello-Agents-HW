@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>计算机考研记忆卡片</title>
+    <script>
+      // 首帧前定主题，避免深色模式下白屏闪烁（FOUC）
+      ;(function () {
+        var t = localStorage.getItem('theme')
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches))
+          document.documentElement.classList.add('dark')
+      })()
+    </script>
+    <script src="/assets/ky_offline_audio.js"></script>
+    <script src="/assets/agent_overlay.js"></script>
+    <script type="module" crossorigin src="/assets/index-CgchWbLX.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-De3eH5hp.css">
+      <style id="ky-custom-enhancements">
+      /* 1. 彻底隐藏右上角登录/注册入口及可能弹出的原生登录模态框 */
+      button:has(svg.lucide-log-in),
+      button:has(svg.lucide-user),
+      button:has([data-lucide="log-in"]),
+      button:has([data-lucide="user"]) {
+        display: none !important;
+      }
+      /* 隐藏头部右侧可能存在的登录按钮文本匹配 */
+      header button:has(span),
+      nav button:has(span) {
+        /* 只针对包含登录/注册的按钮 */
+      }
+      /* 遮罩层与原生模态框若包含登录表单则隐藏 */
+      div[role="dialog"]:has(input[type="email"]),
+      div[role="dialog"]:has(input[type="password"]),
+      div[role="dialog"]:has(form) {
+        display: none !important;
+      }
+      
+      /* 2. 攻防教练与弹窗排版美化增强 */
+      #ky-agent-modal pre, #ky-agent-modal code {
+        font-family: 'Fira Code', Consolas, Monaco, monospace;
+      }
+    </style>
+
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

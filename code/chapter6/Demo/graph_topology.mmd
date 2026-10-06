@@ -1,0 +1,25 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	retrieve_card(retrieve_card)
+	adversarial_examiner(adversarial_examiner)
+	wait_for_answer(wait_for_answer)
+	evaluate(evaluate)
+	reflect_and_synthesize(reflect_and_synthesize)
+	pass_mastery(pass_mastery)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> retrieve_card;
+	adversarial_examiner --> wait_for_answer;
+	evaluate -.-> pass_mastery;
+	evaluate -.-> reflect_and_synthesize;
+	retrieve_card --> adversarial_examiner;
+	wait_for_answer --> evaluate;
+	pass_mastery --> __end__;
+	reflect_and_synthesize --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
