@@ -2,60 +2,92 @@
 (function () {
   console.log('[ky-agent] 初始化 408-MasteryGraph 攻防面板 (Markdown & 可拖动增强版)...');
 
-  // 轻量级安全标准 Markdown 转换器
+  // 标准完备健壮的 Markdown 转换器（支持标题、分割线、公式、列表、粗体、代码块及表格）
   function parseMarkdown(md) {
     if (!md) return '';
-    let html = md
+    let text = md.trim();
+
+    // 1. 占位保护代码块
+    const codeBlocks = [];
+    text = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, function(match, lang, code) {
+      const id = `__CODE_BLOCK_${codeBlocks.length}__`;
+      codeBlocks.push(`<pre style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(148, 163, 184, 0.25); border-radius: 8px; padding: 12px 14px; overflow-x: auto; margin: 12px 0; font-family: Consolas, Monaco, monospace; font-size: 13px; color: #38bdf8; line-height: 1.6; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);"><div style="font-size:11px;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;">${lang || 'code'}</div><code>${escapeHtml(code.trim())}</code></pre>`);
+      return id;
+    });
+
+    // 2. 占位保护行内代码
+    const inlineCodes = [];
+    text = text.replace(/`([^`]+)`/g, function(match, code) {
+      const id = `__INLINE_CODE_${inlineCodes.length}__`;
+      inlineCodes.push(`<code style="background: rgba(99, 102, 241, 0.25); color: #e0e7ff; padding: 2px 6px; border-radius: 4px; font-family: Consolas, monospace; font-size: 13px; border: 1px solid rgba(99, 102, 241, 0.4);">${escapeHtml(code)}</code>`);
+      return id;
+    });
+
+    // 3. 转义HTML基础字符（防止XSS及标签吞掉）
+    text = escapeHtml(text);
+
+    // 4. 水平分割线 --- 或 ***
+    text = text.replace(/^(\s*[-*_]\s*){3,}$/gm, '<hr style="border:none;border-top:1px solid rgba(148, 163, 184, 0.3);margin:16px 0;" />');
+
+    // 5. 各级标题 (支持 # 至 ######)
+    text = text.replace(/^###### (.*$)/gm, '<h6 style="color:#cbd5e1;margin:10px 0 4px 0;font-size:13px;font-weight:700;">$1</h6>');
+    text = text.replace(/^##### (.*$)/gm, '<h5 style="color:#cbd5e1;margin:12px 0 6px 0;font-size:14px;font-weight:700;">$1</h5>');
+    text = text.replace(/^#### (.*$)/gm, '<h4 style="color:#e2e8f0;margin:14px 0 6px 0;font-size:15px;font-weight:700;border-left:3px solid #6366f1;padding-left:8px;">$1</h4>');
+    text = text.replace(/^### (.*$)/gm, '<h3 style="color:#f1f5f9;margin:16px 0 8px 0;font-size:16px;font-weight:700;border-left:4px solid #8b5cf6;padding-left:8px;">$1</h3>');
+    text = text.replace(/^## (.*$)/gm, '<h2 style="color:#f8fafc;margin:18px 0 10px 0;font-size:17px;font-weight:800;">$1</h2>');
+    text = text.replace(/^# (.*$)/gm, '<h1 style="color:#ffffff;margin:20px 0 12px 0;font-size:19px;font-weight:800;">$1</h1>');
+
+    // 6. 粗体与斜体
+    text = text.replace(/\*\*\*(.*?)\*\*\*/g, '<strong style="color: #fde047; font-weight: 700;"><em>$1</em></strong>');
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #fde047; font-weight: 700;">$1</strong>');
+    text = text.replace(/\*(.*?)\*/g, '<em style="color: #cbd5e1;">$1</em>');
+
+    // 7. 引用块
+    text = text.replace(/^> (.*$)/gm, '<blockquote style="border-left: 3px solid #6366f1; background: rgba(99, 102, 241, 0.12); padding: 8px 12px; margin: 8px 0; border-radius: 0 6px 6px 0; color: #cbd5e1; line-height: 1.6;">$1</blockquote>');
+
+    // 8. 列表项规整
+    text = text.replace(/^[\*\-] (.*$)/gm, '<div style="display:flex;align-items:flex-start;margin:4px 0 4px 12px;"><span style="color:#a78bfa;margin-right:8px;font-size:14px;">•</span><span style="color:#e2e8f0;line-height:1.6;">$1</span></div>');
+    text = text.replace(/^(\d+)\. (.*$)/gm, '<div style="display:flex;align-items:flex-start;margin:4px 0 4px 12px;"><span style="color:#60a5fa;margin-right:8px;font-weight:600;">$1.</span><span style="color:#e2e8f0;line-height:1.6;">$2</span></div>');
+
+    // 9. 还原行内代码与代码块
+    inlineCodes.forEach((ic, idx) => {
+      text = text.replace(`__INLINE_CODE_${idx}__`, ic);
+    });
+    codeBlocks.forEach((cb, idx) => {
+      text = text.replace(`__CODE_BLOCK_${idx}__`, cb);
+    });
+
+    // 10. 处理普通换行，保持清晰段落感
+    text = text.replace(/\n\n+/g, '<div style="height:12px;"></div>');
+    text = text.replace(/\n/g, '<br/>');
+
+    return text;
+  }
+
+  function escapeHtml(str) {
+    return str
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
-
-    // 代码块 ```lang ... ```
-    html = html.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, function(match, lang, code) {
-      return `<pre style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(148, 163, 184, 0.2); border-radius: 8px; padding: 12px; overflow-x: auto; margin: 10px 0; font-family: Consolas, Monaco, monospace; font-size: 13px; color: #38bdf8; line-height: 1.5;"><code>${code.trim()}</code></pre>`;
-    });
-
-    // 行内代码 `code`
-    html = html.replace(/`([^`]+)`/g, '<code style="background: rgba(99, 102, 241, 0.2); color: #c7d2fe; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 13px;">$1</code>');
-
-    // 标题 ###, ##, #
-    html = html.replace(/^### (.*$)/gim, '<h4 style="color:#e2e8f0;margin:12px 0 6px 0;font-size:15px;font-weight:700;">$1</h4>');
-    html = html.replace(/^## (.*$)/gim, '<h3 style="color:#f1f5f9;margin:14px 0 8px 0;font-size:16px;font-weight:700;">$1</h3>');
-    html = html.replace(/^# (.*$)/gim, '<h2 style="color:#f8fafc;margin:16px 0 10px 0;font-size:18px;font-weight:800;">$1</h2>');
-
-    // 粗体 **bold**
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #fde047; font-weight: 700;">$1</strong>');
-    // 斜体 *italic*
-    html = html.replace(/\*(.*?)\*/g, '<em style="color: #cbd5e1;">$1</em>');
-
-    // 引用块 > text
-    html = html.replace(/^> (.*$)/gim, '<blockquote style="border-left: 3px solid #6366f1; background: rgba(99, 102, 241, 0.12); padding: 8px 12px; margin: 8px 0; border-radius: 0 6px 6px 0; color: #cbd5e1;">$1</blockquote>');
-
-    // 无序列表 - item 或 * item
-    html = html.replace(/^[\*\-] (.*$)/gim, '<li style="margin-left: 20px; list-style-type: disc; margin-bottom: 4px; color: #e2e8f0;">$1</li>');
-    // 有序列表 1. item
-    html = html.replace(/^\d+\. (.*$)/gim, '<li style="margin-left: 20px; list-style-type: decimal; margin-bottom: 4px; color: #e2e8f0;">$1</li>');
-
-    // 换行
-    html = html.replace(/\n/g, '<br/>');
-
-    // 清理连续多余换行
-    html = html.replace(/(<br\/>){3,}/g, '<br/><br/>');
-    return html;
   }
 
-  // 窗口拖动手柄辅助函数
-  function makeDraggable(handleEl, targetEl) {
-    let isDragging = false;
+  // 通用指针拖拽函数 (支持鼠标与移动端触摸，使用全局捕获确保不丢帧)
+  function makeDraggable(handleEl, targetEl, onClickCallback) {
+    let isPointerDown = false;
+    let hasMoved = false;
     let startX = 0, startY = 0;
     let origLeft = 0, origTop = 0;
 
     handleEl.style.cursor = 'move';
     handleEl.style.userSelect = 'none';
+    handleEl.style.touchAction = 'none';
 
-    handleEl.addEventListener('mousedown', function (e) {
-      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
-      isDragging = true;
+    handleEl.addEventListener('pointerdown', function (e) {
+      if (e.target.tagName === 'BUTTON' && e.target !== handleEl) return;
+      if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      isPointerDown = true;
+      hasMoved = false;
       startX = e.clientX;
       startY = e.clientY;
 
@@ -71,20 +103,22 @@
       targetEl.style.transform = 'none';
       targetEl.style.margin = '0';
 
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-      e.preventDefault();
+      handleEl.setPointerCapture(e.pointerId);
+      e.stopPropagation();
     });
 
-    function onMouseMove(e) {
-      if (!isDragging) return;
+    handleEl.addEventListener('pointermove', function (e) {
+      if (!isPointerDown) return;
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
+
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+        hasMoved = true;
+      }
 
       let newLeft = origLeft + dx;
       let newTop = origTop + dy;
 
-      // 限制在可视区域内
       const maxLeft = window.innerWidth - targetEl.offsetWidth - 10;
       const maxTop = window.innerHeight - targetEl.offsetHeight - 10;
       newLeft = Math.max(10, Math.min(maxLeft, newLeft));
@@ -92,26 +126,39 @@
 
       targetEl.style.left = newLeft + 'px';
       targetEl.style.top = newTop + 'px';
-    }
+    });
 
-    function onMouseUp() {
-      isDragging = false;
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-    }
+    handleEl.addEventListener('pointerup', function (e) {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+      try {
+        handleEl.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+
+      if (!hasMoved && typeof onClickCallback === 'function') {
+        onClickCallback(e);
+      }
+    });
+
+    handleEl.addEventListener('pointercancel', function (e) {
+      isPointerDown = false;
+      try {
+        handleEl.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+    });
   }
 
   function createFloatingCoachButton() {
     if (document.getElementById('ky-agent-fab')) return;
 
-    // 悬浮教练按钮
+    // 悬浮教练按钮 (初始固定在右下角)
     const fab = document.createElement('button');
     fab.id = 'ky-agent-fab';
     fab.innerHTML = '⚔️ 攻防教练';
-    fab.title = '打开 408 暗雷特训与避坑教练面板';
+    fab.title = '可任意拖拽位置，点击打开 408 暗雷特训与避坑教练面板';
     Object.assign(fab.style, {
       position: 'fixed',
-      bottom: '24px',
+      bottom: '30px',
       right: '24px',
       zIndex: '9999',
       padding: '12px 20px',
@@ -122,22 +169,27 @@
       border: 'none',
       borderRadius: '30px',
       boxShadow: '0 8px 24px rgba(124, 58, 237, 0.45)',
-      cursor: 'pointer',
+      cursor: 'move',
       display: 'flex',
       alignItems: 'center',
       gap: '8px',
-      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+      transition: 'box-shadow 0.2s',
+      userSelect: 'none',
+      touchAction: 'none',
       backdropFilter: 'blur(8px)'
     });
 
     fab.onmouseenter = () => {
-      fab.style.transform = 'translateY(-3px) scale(1.03)';
       fab.style.boxShadow = '0 12px 28px rgba(124, 58, 237, 0.6)';
     };
     fab.onmouseleave = () => {
-      fab.style.transform = 'translateY(0) scale(1)';
       fab.style.boxShadow = '0 8px 24px rgba(124, 58, 237, 0.45)';
     };
+
+    // 绑定悬浮按钮拖拽与点击触发弹窗
+    makeDraggable(fab, fab, () => {
+      modal.style.display = 'flex';
+    });
 
     document.body.appendChild(fab);
 
@@ -245,10 +297,6 @@
     // 交互逻辑
     let currentCard = null;
     let currentQuestion = null;
-
-    fab.onclick = () => {
-      modal.style.display = 'flex';
-    };
 
     const btnClose = document.getElementById('ky-agent-btn-close');
     btnClose.onclick = () => {
@@ -377,9 +425,10 @@
     };
   }
 
-  // 彻底移除页面中可能残存的登录注册按钮
-  function purgeLoginUI() {
+  // 彻底移除页面中可能残存的登录注册按钮及底部QQ群等无关文本
+  function purgeUnwantedElements() {
     try {
+      // 1. 登录与注册
       const buttons = document.querySelectorAll('button, a');
       buttons.forEach(btn => {
         const txt = btn.textContent.trim();
@@ -387,18 +436,28 @@
           btn.style.display = 'none';
         }
       });
+
+      // 2. 彻底扫除“考研交流 QQ 群”相关文本节点与容器
+      const allElems = document.querySelectorAll('p, div, span, footer, section');
+      allElems.forEach(el => {
+        if (el.children.length === 0 && (el.textContent.includes('467878948') || el.textContent.includes('考研交流 QQ 群') || el.textContent.includes('加群交流'))) {
+          el.remove();
+        } else if (el.innerText && el.innerText.includes('考研交流 QQ 群：467878948')) {
+          el.remove();
+        }
+      });
     } catch (e) {}
   }
 
-  setInterval(purgeLoginUI, 1000);
+  setInterval(purgeUnwantedElements, 600);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       createFloatingCoachButton();
-      purgeLoginUI();
+      purgeUnwantedElements();
     });
   } else {
     createFloatingCoachButton();
-    purgeLoginUI();
+    purgeUnwantedElements();
   }
 })();

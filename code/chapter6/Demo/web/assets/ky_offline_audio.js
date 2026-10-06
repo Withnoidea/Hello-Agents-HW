@@ -148,16 +148,19 @@
 
   // 3. 构建「知识点语音 MP3 播放模式」悬浮与常驻控制器
   function initAudioPlayerUI() {
+    if (document.getElementById('ky-audio-companion')) return;
     const container = document.createElement('div');
     container.id = 'ky-audio-companion';
     container.innerHTML = `
       <style>
         #ky-audio-companion {
           position: fixed;
-          bottom: 24px;
-          right: 24px;
-          z-index: 9999;
+          bottom: 30px;
+          left: 24px;
+          z-index: 9998;
           font-family: ui-sans-serif, system-ui, sans-serif;
+          user-select: none;
+          touch-action: none;
         }
         .ky-audio-panel {
           background: rgba(30, 41, 59, 0.95);
@@ -342,16 +345,17 @@
     
     // 伴学浮窗拖动手柄辅助函数
     function makeDraggable(handleEl, targetEl) {
-      let isDragging = false;
+      let isPointerDown = false;
       let startX = 0, startY = 0;
       let origLeft = 0, origTop = 0;
 
       handleEl.style.cursor = 'move';
       handleEl.style.userSelect = 'none';
+      handleEl.style.touchAction = 'none';
 
-      handleEl.addEventListener('mousedown', function (e) {
+      handleEl.addEventListener('pointerdown', function (e) {
         if (e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
-        isDragging = true;
+        isPointerDown = true;
         startX = e.clientX;
         startY = e.clientY;
 
@@ -367,13 +371,14 @@
         targetEl.style.transform = 'none';
         targetEl.style.margin = '0';
 
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
+        try {
+          handleEl.setPointerCapture(e.pointerId);
+        } catch (err) {}
         e.preventDefault();
       });
 
-      function onMouseMove(e) {
-        if (!isDragging) return;
+      handleEl.addEventListener('pointermove', function (e) {
+        if (!isPointerDown) return;
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
 
@@ -387,13 +392,21 @@
 
         targetEl.style.left = newLeft + 'px';
         targetEl.style.top = newTop + 'px';
-      }
+      });
 
-      function onMouseUp() {
-        isDragging = false;
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-      }
+      handleEl.addEventListener('pointerup', function (e) {
+        isPointerDown = false;
+        try {
+          handleEl.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+      });
+
+      handleEl.addEventListener('pointercancel', function (e) {
+        isPointerDown = false;
+        try {
+          handleEl.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+      });
     }
 
     const panelHeader = container.querySelector('.ky-panel-header');
@@ -547,10 +560,34 @@
     }, 1500);
   }
 
-  // 页面加载完成后注入伴学组件
+  // 动态扫描并彻底移除遗留的 QQ群/反馈 悬浮模块或DOM节点
+  function purgeUnwantedElements() {
+    try {
+      const allElements = document.querySelectorAll('div, a, span, p, footer, aside, section');
+      allElements.forEach(el => {
+        // 如果包含 467878948 或 考研交流 QQ 群
+        const text = el.innerText || '';
+        if (text.includes('467878948') || (text.includes('考研交流') && text.includes('群'))) {
+          // 找到最高层级的独立悬浮容器或该行
+          let target = el;
+          while (target.parentElement && target.parentElement !== document.body && target.parentElement.innerText.trim() === text.trim()) {
+            target = target.parentElement;
+          }
+          target.remove();
+        }
+      });
+    } catch (e) {}
+  }
+
+  // 页面加载完成后注入伴学组件与清理器
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAudioPlayerUI);
+    document.addEventListener('DOMContentLoaded', () => {
+      initAudioPlayerUI();
+      purgeUnwantedElements();
+    });
   } else {
     initAudioPlayerUI();
+    purgeUnwantedElements();
   }
+  setInterval(purgeUnwantedElements, 800);
 })();

@@ -237,10 +237,13 @@ class KyWebHandler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=WEB_DIR, **kwargs)
 
     def end_headers(self):
-        # 允许跨域与无缓存配置
+        # 允许跨域与强制禁用客户端缓存，确保前端改动即时生效
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
         super().end_headers()
 
     def do_OPTIONS(self):
@@ -249,6 +252,20 @@ class KyWebHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         req_path = self.path.split("?")[0]
+        if req_path in ["/api/agent/leaderboard", "/api/v1/agent/leaderboard"]:
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.end_headers()
+            board = [
+                {"rank": 1, "nickname": "东南408必过战神", "score": 98, "badge": "算法宗师", "solved": 42},
+                {"rank": 2, "nickname": "机组流水线侦探", "score": 94, "badge": "硬件架构师", "solved": 38},
+                {"rank": 3, "nickname": "PV原语零死锁", "score": 91, "badge": "并发先锋", "solved": 35},
+                {"rank": 4, "nickname": "滑动窗口抓包王", "score": 88, "badge": "协议精算师", "solved": 31},
+                {"rank": 5, "nickname": "红黑树左旋右旋", "score": 85, "badge": "结构行家", "solved": 29}
+            ]
+            self.wfile.write(json.dumps({"status": "success", "data": board}, ensure_ascii=False).encode("utf-8"))
+            return
+
         if req_path == "/api/agent/cards_stats":
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")

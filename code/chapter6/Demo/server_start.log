@@ -1,0 +1,64 @@
+✅ 成功加载考研408全科目知识卡片库: 共 406 张卡片
+✅ 成功加载已有反思避坑卡片: 共 5 张
+
+=======================================================
+🚀 408-MasteryGraph 全栈 Web 攻防教学系统已启动！
+🌐 本地访问地址: http://127.0.0.1:8088
+📚 已挂载 408 核心考点卡片: 406 张
+💡 Agent 攻防审题与自愈闭环 API 已就绪
+=======================================================
+
+127.0.0.1 - - [06/Oct/2026 23:46:15] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:47:56] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:47:56] "GET /assets/agent_overlay.js HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:47:56] "GET /assets/ky_offline_audio.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:47:56] "GET /assets/agent_overlay.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:47:56] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:47:56] "GET /api/leaderboard HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:09] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:10] "GET /assets/ky_offline_audio.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:10] "GET /assets/agent_overlay.js HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:10] "GET /assets/agent_overlay.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:10] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:10] "GET /api/leaderboard HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:13] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:13] "GET /assets/agent_overlay.js HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:13] "GET /assets/ky_offline_audio.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:13] "GET /assets/agent_overlay.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:13] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:13] "GET /api/leaderboard HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:18] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:18] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:30] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:30] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:30] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:30] "GET /assets/agent_overlay.js HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:30] "GET /assets/ky_offline_audio.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:30] "GET /assets/agent_overlay.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:30] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:30] "GET /api/leaderboard HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:33] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:33] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:33] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:33] "GET /assets/agent_overlay.js HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:33] "GET /assets/ky_offline_audio.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:33] "GET /assets/agent_overlay.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:34] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:34] "GET /api/leaderboard HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /assets/ky_offline_audio.js HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /assets/agent_overlay.js HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /assets/index-De3eH5hp.css HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /assets/index-CgchWbLX.js HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /assets/ky_offline_audio.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /assets/agent_overlay.js?v=20261006_v2 HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:48:46] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:48:46] "GET /api/leaderboard HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:49:29] "POST /api/agent/challenge HTTP/1.1" 200 -
+127.0.0.1 - - [06/Oct/2026 23:56:19] code 404, message File not found
+127.0.0.1 - - [06/Oct/2026 23:56:19] "GET /api/v1/agent/leaderboard HTTP/1.1" 404 -
+127.0.0.1 - - [06/Oct/2026 23:56:19] "GET /api/agent/cards_stats HTTP/1.1" 200 -
